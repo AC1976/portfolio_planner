@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="emerald">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box 3 Financial Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .input-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-align: left;
+        }
+        .input-group input {
+            text-align: left;
+            width: 100%;
+        }
+        /* Ensure consistent input sizing */
+        .collapse-content input {
+            height: 2.25rem;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-base-200">
+    <div class="navbar bg-primary text-primary-content shadow-lg">
+        <div class="flex-1">
+            <span class="text-xl font-bold px-4">📊 Box 3 Financial Planner</span>
+        </div>
+        <div class="flex-none">
+            <a href="https://crassus.pro" target="_blank" class="badge badge-ghost hover:badge-outline cursor-pointer">
+                Sponsored by Crassus Pro — run your property empire like a God
+            </a>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Input Panel -->
+            <div class="lg:col-span-1">
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title text-lg mb-4">📝 Parameters</h2>
+                        
+                        <!-- Collapsible sections -->
+                        <div class="collapse collapse-arrow bg-base-200 mb-2">
+                            <input type="checkbox" checked />
+                            <div class="collapse-title font-medium">Starting Portfolio</div>
+                            <div class="collapse-content">
+                                <div class="input-group">
+                                    <label>Equity (€)</label>
+                                    <input type="text" id="start_equity" class="input input-bordered input-sm currency-input" data-value="2000000">
+                                </div>
+                                <div class="input-group">
+                                    <label>Bonds (€)</label>
+                                    <input type="text" id="start_bonds" class="input input-bordered input-sm currency-input" data-value="1100000">
+                                </div>
+                                <div class="input-group">
+                                    <label>Property (€)</label>
+                                    <input type="text" id="start_property" class="input input-bordered input-sm currency-input" data-value="1800000">
+                                </div>
+                                <div class="input-group">
+                                    <label>Cash (€)</label>
+                                    <input type="text" id="start_cash" class="input input-bordered input-sm currency-input" data-value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapse collapse-arrow bg-base-200 mb-2">
+                            <input type="checkbox" checked />
+                            <div class="collapse-title font-medium">Expected Returns</div>
+                            <div class="collapse-content">
+                                <div class="input-group">
+                                    <label>Equity Growth (%)</label>
+                                    <input type="text" id="equity_growth_rate" class="input input-bordered input-sm percent-input" data-value="6.5">
+                                </div>
+                                <div class="input-group">
+                                    <label>Equity Dividend (%)</label>
+                                    <input type="text" id="equity_dividend_yield" class="input input-bordered input-sm percent-input" data-value="0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Bond Coupon (%)</label>
+                                    <input type="text" id="bond_coupon" class="input input-bordered input-sm percent-input" data-value="6.5">
+                                </div>
+                                <div class="input-group">
+                                    <label>Property Yield (%)</label>
+                                    <input type="text" id="property_net_yield" class="input input-bordered input-sm percent-input" data-value="8.8">
+                                </div>
+                                <div class="input-group">
+                                    <label>Cash Rate (%)</label>
+                                    <input type="text" id="cash_rate" class="input input-bordered input-sm percent-input" data-value="1.25">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapse collapse-arrow bg-base-200 mb-2">
+                            <input type="checkbox" />
+                            <div class="collapse-title font-medium">Box 3 Current Regime</div>
+                            <div class="collapse-content">
+                                <div class="input-group">
+                                    <label>Deemed Cash (%)</label>
+                                    <input type="text" id="box3_return_on_cash_current" class="input input-bordered input-sm percent-input" data-value="1.5">
+                                </div>
+                                <div class="input-group">
+                                    <label>Deemed Other (%)</label>
+                                    <input type="text" id="box3_return_on_other_current" class="input input-bordered input-sm percent-input" data-value="6.0">
+                                </div>
+                                <div class="input-group">
+                                    <label>Tax Rate (%)</label>
+                                    <input type="text" id="box3_rate_current" class="input input-bordered input-sm percent-input" data-value="36">
+                                </div>
+                                <div class="input-group">
+                                    <label>Exemption (€)</label>
+                                    <input type="text" id="box3_exemption_current" class="input input-bordered input-sm currency-input" data-value="104000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapse collapse-arrow bg-base-200 mb-2">
+                            <input type="checkbox" />
+                            <div class="collapse-title font-medium">Box 3 Future Regime</div>
+                            <div class="collapse-content">
+                                <div class="input-group">
+                                    <label>Start Year</label>
+                                    <input type="text" id="box3_new_start_year" class="input input-bordered input-sm year-input" data-value="2028">
+                                </div>
+                                <div class="input-group">
+                                    <label>Tax Rate (%)</label>
+                                    <input type="text" id="box3_rate_future" class="input input-bordered input-sm percent-input" data-value="36">
+                                </div>
+                                <div class="input-group">
+                                    <label>Exemption (€)</label>
+                                    <input type="text" id="box3_exemption_future" class="input input-bordered input-sm currency-input" data-value="5000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapse collapse-arrow bg-base-200 mb-2">
+                            <input type="checkbox" checked />
+                            <div class="collapse-title font-medium">Planning & Drawdown</div>
+                            <div class="collapse-content">
+                                <div class="input-group">
+                                    <label>Start Year</label>
+                                    <input type="text" id="planning_start_year" class="input input-bordered input-sm year-input" data-value="2026">
+                                </div>
+                                <div class="input-group">
+                                    <label>Horizon (Years)</label>
+                                    <input type="text" id="planning_horizon_years" class="input input-bordered input-sm year-input" data-value="10">
+                                </div>
+                                <div class="input-group">
+                                    <label>Drawdown (€/yr)</label>
+                                    <input type="text" id="drawdown_per_year" class="input input-bordered input-sm currency-input" data-value="60000">
+                                </div>
+                                <div class="input-group">
+                                    <label>Drawdown Start</label>
+                                    <input type="text" id="drawdown_start_year" class="input input-bordered input-sm year-input" data-value="2028">
+                                </div>
+                                <div class="input-group">
+                                    <label>Inflation (%)</label>
+                                    <input type="text" id="inflation_rate" class="input input-bordered input-sm percent-input" data-value="2.25">
+                                </div>
+                                <div class="input-group">
+                                    <label>Reinvest in Eq. (%)</label>
+                                    <input type="text" id="excess_cash_reinvestment_in_equity" class="input input-bordered input-sm percent-input" data-value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="calculateBtn" class="btn btn-primary w-full mt-4">
+                            <span id="btnText">Calculate</span>
+                            <span id="btnLoading" class="loading loading-spinner hidden"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="lg:col-span-2">
+                <div id="resultsPanel" class="space-y-6">
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="stat bg-base-100 rounded-box shadow">
+                            <div class="stat-title text-xs">Starting Value</div>
+                            <div class="stat-value text-lg text-primary" id="summaryStart">-</div>
+                        </div>
+                        <div class="stat bg-base-100 rounded-box shadow">
+                            <div class="stat-title text-xs">Final Value</div>
+                            <div class="stat-value text-lg text-success" id="summaryEnd">-</div>
+                        </div>
+                        <div class="stat bg-base-100 rounded-box shadow">
+                            <div class="stat-title text-xs">Total Tax Paid</div>
+                            <div class="stat-value text-lg text-error" id="summaryTax">-</div>
+                        </div>
+                        <div class="stat bg-base-100 rounded-box shadow">
+                            <div class="stat-title text-xs">Total Drawdown</div>
+                            <div class="stat-value text-lg text-warning" id="summaryDrawdown">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title text-base">Portfolio Value Over Time</h3>
+                            <canvas id="valueChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="card bg-base-100 shadow-xl">
+                            <div class="card-body">
+                                <h3 class="card-title text-base">Asset Allocation</h3>
+                                <canvas id="allocationChart" height="200"></canvas>
+                            </div>
+                        </div>
+                        <div class="card bg-base-100 shadow-xl">
+                            <div class="card-body">
+                                <h3 class="card-title text-base">Cash Flow & Tax</h3>
+                                <canvas id="cashflowChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="card-title text-base">Detailed Results</h3>
+                                <button id="exportBtn" class="btn btn-sm btn-outline btn-success" onclick="exportToExcel()">
+                                    📥 Export to Excel
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto overflow-y-auto" style="min-height: 400px; max-height: 600px;">
+                                <table class="table table-xs table-zebra">
+                                    <thead class="sticky top-0 bg-base-200 z-10">
+                                        <tr id="tableHeader"></tr>
+                                    </thead>
+                                    <tbody id="tableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer footer-center p-4 bg-base-300 text-base-content mt-8">
+        <div>
+            <p>Box 3 Financial Planner — For informational purposes only. Consult a tax advisor for professional advice.</p>
+        </div>
+    </footer>
+
+    <!-- Toast notification -->
+    <div id="promoToast" class="toast toast-end toast-bottom z-50 hidden">
+        <div class="alert alert-info shadow-lg">
+            <div>
+                <span>🏛️ Enjoying Box 3 Planner? Check out <a href="https://crassus.pro" target="_blank" class="link font-bold">Crassus Pro</a> for full property management!</span>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="hideToast()">✕</button>
+        </div>
+    </div>
+
+    <script>
+        let valueChart, allocationChart, cashflowChart;
+        let currentResultData = null; // Store results for export
+        let calculateCount = 0; // Track calculations for toast
+        let toastShown = false; // Only show toast once
+
+        function showToast() {
+            const toast = document.getElementById('promoToast');
+            toast.classList.remove('hidden');
+            // Auto-hide after 8 seconds
+            setTimeout(hideToast, 8000);
+        }
+
+        function hideToast() {
+            document.getElementById('promoToast').classList.add('hidden');
+        }
+
+        // Dutch number formatting (dots as thousand separators, comma as decimal)
+        function formatDutchNumber(value) {
+            if (value === null || value === undefined || value === '') return '';
+            const num = parseFloat(value);
+            if (isNaN(num)) return '';
+            
+            // Format with dots as thousand separators
+            const parts = num.toFixed(2).split('.');
+            const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            
+            // For integers, don't show decimals
+            if (parseFloat(parts[1]) === 0) {
+                return intPart;
+            }
+            return intPart + ',' + parts[1];
+        }
+
+        function formatDutchInteger(value) {
+            if (value === null || value === undefined || value === '') return '';
+            const num = parseInt(value);
+            if (isNaN(num)) return '';
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function formatDutchDecimal(value) {
+            if (value === null || value === undefined || value === '') return '';
+            const num = parseFloat(value);
+            if (isNaN(num)) return '';
+            // Use comma as decimal separator
+            return num.toString().replace('.', ',');
+        }
+
+        // Parse Dutch formatted number back to float
+        function parseDutchNumber(str) {
+            if (!str) return 0;
+            // Remove dots (thousand separators) and replace comma with dot (decimal)
+            const cleaned = str.toString().replace(/\./g, '').replace(',', '.');
+            return parseFloat(cleaned) || 0;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('nl-NL', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function formatCompact(value) {
+            // Format as thousands with dot separator and K suffix
+            const thousands = Math.round(value / 1000);
+            const formatted = thousands.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return '€ ' + formatted + 'K';
+        }
+
+        // Initialize all input fields with formatted values
+        function initializeInputs() {
+            document.querySelectorAll('.currency-input').forEach(input => {
+                const value = input.dataset.value;
+                input.value = formatDutchInteger(value);
+            });
+            
+            document.querySelectorAll('.percent-input').forEach(input => {
+                const value = input.dataset.value;
+                input.value = formatDutchDecimal(value);
+            });
+            
+            document.querySelectorAll('.year-input').forEach(input => {
+                const value = input.dataset.value;
+                input.value = value; // Years don't need formatting
+            });
+        }
+
+        // Format on blur, parse on focus
+        function setupInputFormatting() {
+            document.querySelectorAll('.currency-input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    // Show raw number for editing
+                    const val = parseDutchNumber(this.value);
+                    this.value = val || '';
+                    this.select();
+                });
+                
+                input.addEventListener('blur', function() {
+                    const val = parseDutchNumber(this.value);
+                    this.dataset.value = val;
+                    this.value = formatDutchInteger(val);
+                });
+            });
+            
+            document.querySelectorAll('.percent-input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    const val = parseDutchNumber(this.value);
+                    this.value = val || '';
+                    this.select();
+                });
+                
+                input.addEventListener('blur', function() {
+                    const val = parseDutchNumber(this.value);
+                    this.dataset.value = val;
+                    this.value = formatDutchDecimal(val);
+                });
+            });
+        }
+
+        function getFormData() {
+            return {
+                start_equity: parseDutchNumber(document.getElementById('start_equity').value),
+                start_bonds: parseDutchNumber(document.getElementById('start_bonds').value),
+                start_property: parseDutchNumber(document.getElementById('start_property').value),
+                start_cash: parseDutchNumber(document.getElementById('start_cash').value),
+                equity_growth_rate: parseDutchNumber(document.getElementById('equity_growth_rate').value) / 100,
+                equity_dividend_yield: parseDutchNumber(document.getElementById('equity_dividend_yield').value) / 100,
+                bond_coupon: parseDutchNumber(document.getElementById('bond_coupon').value) / 100,
+                property_net_yield: parseDutchNumber(document.getElementById('property_net_yield').value) / 100,
+                cash_rate: parseDutchNumber(document.getElementById('cash_rate').value) / 100,
+                box3_return_on_cash_current: parseDutchNumber(document.getElementById('box3_return_on_cash_current').value) / 100,
+                box3_return_on_other_current: parseDutchNumber(document.getElementById('box3_return_on_other_current').value) / 100,
+                box3_rate_current: parseDutchNumber(document.getElementById('box3_rate_current').value) / 100,
+                box3_exemption_current: parseDutchNumber(document.getElementById('box3_exemption_current').value),
+                box3_rate_future: parseDutchNumber(document.getElementById('box3_rate_future').value) / 100,
+                box3_exemption_future: parseDutchNumber(document.getElementById('box3_exemption_future').value),
+                box3_new_start_year: parseInt(document.getElementById('box3_new_start_year').value),
+                excess_cash_reinvestment_in_equity: parseDutchNumber(document.getElementById('excess_cash_reinvestment_in_equity').value) / 100,
+                inflation_rate: parseDutchNumber(document.getElementById('inflation_rate').value) / 100,
+                planning_horizon_years: parseInt(document.getElementById('planning_horizon_years').value),
+                planning_start_year: parseInt(document.getElementById('planning_start_year').value),
+                drawdown_per_year: parseDutchNumber(document.getElementById('drawdown_per_year').value),
+                drawdown_start_year: parseInt(document.getElementById('drawdown_start_year').value),
+            };
+        }
+
+        function updateSummary(data) {
+            const firstYear = data[0];
+            const lastYear = data[data.length - 1];
+            const startValue = firstYear.start_Equity + firstYear.start_Bonds + firstYear.start_Property + firstYear.start_Cash;
+            const endValue = lastYear.Total_Value;
+            const totalTax = data.reduce((sum, row) => sum + row.box3_Tax, 0);
+            const totalDrawdown = data.reduce((sum, row) => sum + row.cashflow_Drawdown, 0);
+
+            document.getElementById('summaryStart').textContent = formatCompact(startValue);
+            document.getElementById('summaryEnd').textContent = formatCompact(endValue);
+            document.getElementById('summaryTax').textContent = formatCompact(totalTax);
+            document.getElementById('summaryDrawdown').textContent = formatCompact(totalDrawdown);
+        }
+
+        function updateCharts(data) {
+            const years = data.map(d => d.Year);
+            const totalValues = data.map(d => d.Total_Value);
+            const equityValues = data.map(d => d.start_Equity);
+            const bondValues = data.map(d => d.start_Bonds);
+            const propertyValues = data.map(d => d.start_Property);
+            const cashValues = data.map(d => d.start_Cash);
+            const taxValues = data.map(d => d.box3_Tax);
+            const cashflowValues = data.map(d => d.cashflow_Total);
+            const drawdownValues = data.map(d => d.cashflow_Drawdown);
+
+            // Destroy existing charts
+            if (valueChart) valueChart.destroy();
+            if (allocationChart) allocationChart.destroy();
+            if (cashflowChart) cashflowChart.destroy();
+
+            // Portfolio Value Chart
+            const valueCtx = document.getElementById('valueChart').getContext('2d');
+            valueChart = new Chart(valueCtx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Total Portfolio Value',
+                        data: totalValues,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => formatCurrency(ctx.raw)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: (value) => formatCompact(value)
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Asset Allocation Chart (Stacked Area)
+            const allocCtx = document.getElementById('allocationChart').getContext('2d');
+            allocationChart = new Chart(allocCtx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [
+                        { label: 'Equity', data: equityValues, backgroundColor: '#3b82f6' },
+                        { label: 'Bonds', data: bondValues, backgroundColor: '#10b981' },
+                        { label: 'Property', data: propertyValues, backgroundColor: '#f59e0b' },
+                        { label: 'Cash', data: cashValues, backgroundColor: '#6b7280' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { stacked: true },
+                        y: {
+                            stacked: true,
+                            ticks: { callback: (value) => formatCompact(value) }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: { label: (ctx) => ctx.dataset.label + ': ' + formatCurrency(ctx.raw) }
+                        }
+                    }
+                }
+            });
+
+            // Cash Flow Chart
+            const cfCtx = document.getElementById('cashflowChart').getContext('2d');
+            cashflowChart = new Chart(cfCtx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [
+                        { label: 'Net Cash Flow', data: cashflowValues, backgroundColor: '#22c55e' },
+                        { label: 'Tax', data: taxValues.map(v => -v), backgroundColor: '#ef4444' },
+                        { label: 'Drawdown', data: drawdownValues.map(v => -v), backgroundColor: '#f97316' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            ticks: { callback: (value) => formatCompact(value) }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: { label: (ctx) => ctx.dataset.label + ': ' + formatCurrency(Math.abs(ctx.raw)) }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTable(data) {
+            const displayCols = [
+                'Year',
+                'start_Equity',
+                'start_Bonds',
+                'start_Property',
+                'start_Cash',
+                'income_Equity_Growth',
+                'income_Equity_Dividend',
+                'income_Bonds_Coupon',
+                'income_Rentals',
+                'income_Interest_on_Cash',
+                'box3_Old_or_New',
+                'box3_Income',
+                'box3_Tax',
+                'cashflow_Equity_Dividend',
+                'cashflow_Bonds_Coupon',
+                'cashflow_Rentals',
+                'cashflow_Interest_on_Cash',
+                'cashflow_Drawdown',
+                'cashflow_Box3_Tax',
+                'cashflow_Total',
+                'Total_Value'
+            ];
+            const headerLabels = [
+                'Year',
+                'Equity',
+                'Bonds',
+                'Property',
+                'Cash',
+                'Eq. Growth',
+                'Eq. Dividend',
+                'Bond Coupon',
+                'Rentals',
+                'Cash Interest',
+                'Regime',
+                'Box3 Income',
+                'Box3 Tax',
+                'CF Dividend',
+                'CF Coupon',
+                'CF Rentals',
+                'CF Interest',
+                'Drawdown',
+                'CF Tax',
+                'Net CF',
+                'Total Value'
+            ];
+            
+            // Header
+            const headerRow = document.getElementById('tableHeader');
+            headerRow.innerHTML = headerLabels.map(h => `<th>${h}</th>`).join('');
+            
+            // Body
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = data.map(row => {
+                return '<tr>' + displayCols.map(col => {
+                    let val = row[col];
+                    if (typeof val === 'number' && col !== 'Year') {
+                        val = formatCurrency(val);
+                    }
+                    return `<td>${val}</td>`;
+                }).join('') + '</tr>';
+            }).join('');
+        }
+
+        async function calculate() {
+            const btn = document.getElementById('calculateBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            btn.disabled = true;
+            btnText.textContent = 'Calculating...';
+            btnLoading.classList.remove('hidden');
+
+            try {
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(getFormData())
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentResultData = result.data; // Store for export
+                    updateSummary(result.data);
+                    updateCharts(result.data);
+                    updateTable(result.data);
+                    
+                    // Show promo toast after 3 calculations (only once)
+                    calculateCount++;
+                    if (calculateCount >= 3 && !toastShown) {
+                        toastShown = true;
+                        showToast();
+                    }
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Calculate';
+                btnLoading.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('calculateBtn').addEventListener('click', calculate);
+        
+        function exportToExcel() {
+            if (!currentResultData || currentResultData.length === 0) {
+                alert('No data to export. Please run a calculation first.');
+                return;
+            }
+            
+            // Column headers for the Excel file
+            const headers = [
+                'Year',
+                'Equity',
+                'Bonds',
+                'Property',
+                'Cash',
+                'Equity Growth',
+                'Equity Dividend',
+                'Bond Coupon',
+                'Rentals',
+                'Cash Interest',
+                'Tax Regime',
+                'Box3 Income',
+                'Box3 Tax',
+                'CF Dividend',
+                'CF Coupon',
+                'CF Rentals',
+                'CF Interest',
+                'Drawdown',
+                'CF Tax',
+                'Net Cash Flow',
+                'Total Value'
+            ];
+            
+            const dataKeys = [
+                'Year',
+                'start_Equity',
+                'start_Bonds',
+                'start_Property',
+                'start_Cash',
+                'income_Equity_Growth',
+                'income_Equity_Dividend',
+                'income_Bonds_Coupon',
+                'income_Rentals',
+                'income_Interest_on_Cash',
+                'box3_Old_or_New',
+                'box3_Income',
+                'box3_Tax',
+                'cashflow_Equity_Dividend',
+                'cashflow_Bonds_Coupon',
+                'cashflow_Rentals',
+                'cashflow_Interest_on_Cash',
+                'cashflow_Drawdown',
+                'cashflow_Box3_Tax',
+                'cashflow_Total',
+                'Total_Value'
+            ];
+            
+            // Build worksheet data
+            const wsData = [headers];
+            currentResultData.forEach(row => {
+                const rowData = dataKeys.map(key => row[key]);
+                wsData.push(rowData);
+            });
+            
+            // Add watermark rows
+            wsData.push([]); // Empty row
+            wsData.push(['Generated by Box 3 Financial Planner']);
+            wsData.push(['Sponsored by Crassus Pro — run your property empire like a God']);
+            wsData.push(['https://crassus.pro']);
+            
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_array ? XLSX.utils.aoa_to_sheet(wsData) : XLSX.utils.aoa_to_sheet(wsData);
+            
+            // Set column widths
+            ws['!cols'] = headers.map(() => ({ wch: 14 }));
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Box3 Projection');
+            
+            // Generate filename with date
+            const date = new Date().toISOString().slice(0, 10);
+            const filename = `box3_projection_${date}.xlsx`;
+            
+            // Download
+            XLSX.writeFile(wb, filename);
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeInputs();
+            setupInputFormatting();
+            calculate();
+        });
+    </script>
+</body>
+</html>
